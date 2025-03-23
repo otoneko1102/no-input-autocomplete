@@ -13,38 +13,38 @@ document.addEventListener("DOMContentLoaded", async () => {
       toggle.disabled = true;
     }
   } catch (e) {
-    // console.error("Error:", e);
     toggle.disabled = true;
   }
 
   currentDomainElem.textContent = `Current page: ${domain}`;
 
-  chrome.storage.sync.get(["disabledSites"], (data) => {
-    const disabledSites = data.disabledSites || {};
-    toggle.checked = !disabledSites[domain];
-    updateIgnoredList(disabledSites);
+  chrome.storage.sync.get(["ignoredSites"], (data) => {
+    const ignoredSites = data.ignoredSites || {};
+    toggle.checked = !ignoredSites[domain];
+    updateIgnoredList(ignoredSites);
   });
 
   toggle.addEventListener("change", () => {
-    chrome.storage.sync.get(["disabledSites"], (data) => {
-      const disabledSites = data.disabledSites || {};
+    chrome.storage.sync.get(["ignoredSites"], (data) => {
+      const ignoredSites = data.ignoredSites || {};
       if (toggle.checked) {
-        delete disabledSites[domain];
+        delete ignoredSites[domain];
       } else {
-        disabledSites[domain] = true;
+        ignoredSites[domain] = true;
       }
-      chrome.storage.sync.set({ disabledSites }, () => updateIgnoredList(disabledSites));
+      chrome.storage.sync.set({ ignoredSites }, () => {
+        updateIgnoredList(ignoredSites);
+        if (domain !== "unknown") {
+          chrome.tabs.reload().catch((e) => console.error("Error:", e));
+        }
+      });
     });
-
-    if (domain !== "unknown") {
-      chrome.tabs.reload().catch((e) => console.error("Error:", e));
-    }
   });
 
-  function updateIgnoredList(disabledSites) {
+  function updateIgnoredList(ignoredSites) {
     ignoredListElem.innerHTML = "";
 
-    Object.keys(disabledSites).forEach((savedDomain) => {
+    Object.keys(ignoredSites).forEach((savedDomain) => {
       const row = document.createElement("tr");
 
       const domainCell = document.createElement("td");
@@ -55,9 +55,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "x";
       deleteBtn.addEventListener("click", () => {
-        delete disabledSites[savedDomain];
-        chrome.storage.sync.set({ disabledSites }, () => {
-          updateIgnoredList(disabledSites);
+        delete ignoredSites[savedDomain];
+        chrome.storage.sync.set({ ignoredSites }, () => {
+          updateIgnoredList(ignoredSites);
           if (savedDomain === domain) {
             toggle.checked = true;
             chrome.tabs.reload().catch((e) => console.error("Error:", e));

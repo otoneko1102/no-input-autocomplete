@@ -13,13 +13,12 @@
   try {
     domain = window.location.hostname.replace(/^www\./, "");
   } catch (e) {
-    console.error("Error getting hostname:", e);
     return;
   }
 
-  chrome.storage.sync.get(["disabledSites"], (data) => {
-    const disabledSites = data.disabledSites || {};
-    if (disabledSites[domain]) return;
+  chrome.storage.sync.get(["ignoredSites"], (data) => {
+    const ignoredSites = data.ignoredSites || {};
+    if (ignoredSites[domain]) return;
 
     processInputs();
 
@@ -44,7 +43,11 @@
 
   document.addEventListener("readystatechange", () => {
     if (document.readyState === "interactive" || document.readyState === "complete") {
-      processInputs();
+      chrome.storage.sync.get(["ignoredSites"], (data) => {
+        if (!(data.ignoredSites || {})[domain]) {
+          processInputs();
+        }
+      });
     }
   });
 })();
