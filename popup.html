@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Input Autocomplete</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <h2>No Input Autocomplete</h2>
+    <p id="current-domain">Loading...</p>
+    <label>
+      <input type="checkbox" id="toggle"> Enable
+    </label>
+    <h3>Ignored List</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Domains</th>
+          <th>Del</th>
+        </tr>
+      </thead>
+      <tbody id="ignored-list">
+      </tbody>
+    </table>
+    <script src="popup.js"></script>
+  </body>
+</html>
